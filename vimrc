@@ -51,7 +51,6 @@ if &t_Co > 2 || has("gui_running")
   set hlsearch
 endif
 
-filetype plugin on
 
 if &term=="xterm"
      set t_Co=8
@@ -64,32 +63,27 @@ endif
 let &guicursor = &guicursor . ",a:blinkon0"
 
 "For xxz"
+"基本通用配置
 set smarttab        "智能tab
-set tabstop=2	    "tab显示的空格数
-set softtabstop=2   "插入的空格数
-set shiftwidth=2    "一次删除操作删除的空格
+set tabstop=4	    "tab显示的空格数
+set softtabstop=4   "插入的空格数
+set shiftwidth=4   "一次删除操作删除的空格
 set expandtab       "noexpandtab 使用空格代替tab
 set nu 		    "显示行号
+set autoindent "自动缩进
+set cindent "C语言语法自动缩进
+filetype plugin indent on
 
-:inoremap ( ()<ESC>i
-:inoremap ) <c-r>=ClosePair(')')<CR>
-:inoremap { {<CR>}<ESC>O
-:inoremap } <c-r>=ClosePair('}')<CR>
-:inoremap [ []<ESC>i
-:inoremap ] <c-r>=ClosePair(']')<CR>
-:inoremap " ""<ESC>i
-:inoremap ' ''<ESC>i
+"pathogen + git
+"插件管理工具pathogen启动
+runtime bundle/vim-pathogen/autoload/pathogen.vim
+"pathogen加载插件目录下的插件, 参数可指定插件目录位置，默认为～/.vim/bundle
+call pathogen#infect()
 
-
-function ClosePair(char)
-  if getline('.')[col('.') - 1] == a:char
-      return "/<Right>"
-  else
-      return a:char
-  endif
-endfunction
 
 "Completion"
+augroup allcomplete
+autocmd!
 autocmd FileType python set omnifunc=pythoncomplete#Complete
 autocmd FileType javascrīpt set omnifunc=javascrīptcomplete#CompleteJS
 autocmd FileType html set omnifunc=htmlcomplete#CompleteTags
@@ -97,6 +91,21 @@ autocmd FileType css set omnifunc=csscomplete#CompleteCSS
 autocmd FileType xml set omnifunc=xmlcomplete#CompleteTags
 autocmd FileType php set omnifunc=phpcomplete#CompletePHP
 autocmd FileType c set omnifunc=ccomplete#Complete
+augroup END
+
+"环境定义
+augroup environment
+autocmd!
+augroup END
+
+
+"python ide
+if has("autocmd")
+  augroup pythonide
+  autocmd BufNewFile,BufRead *.py nmap <F5> :w<CR>:!python %<CR><CR>
+
+  augroup END
+endif
 
 ""
 if(has("win32") || has("win95") || has("win64") || has("win16"))
@@ -105,7 +114,6 @@ else
     let g:vimrc_iswindows=0
 endif
 autocmd BufEnter * lcd %:p:h
-
 
 map <F12> :call Do_CsTag()<CR>
 nmap <C-@>s :cs find s <C-R>=expand("<cword>")<CR><CR>:copen<CR>
